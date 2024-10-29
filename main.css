@@ -1,0 +1,168 @@
+body {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+h1 {
+  text-align: center;
+}
+
+p {
+  margin: 0px;
+  color: #6256ca;
+}
+#dropZone {
+  border: 2px dashed #6256ca;
+  padding: 40px;
+  text-align: center;
+  margin: 20px 0;
+  cursor: pointer;
+}
+#dropZone.drag-over {
+  background-color: #f0f0f0;
+}
+#convertBtn,
+#downloadBtn {
+  color: #ffffff;
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #6256ca;
+  border: none;
+}
+
+#convertBtn:hover,
+#downloadBtn:hover {
+  color: #f0f0f0;
+  cursor: pointer;
+  margin: 20px auto;
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #6256ca;
+}
+#loadingOverlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff48;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 1000;
+}
+#loadingText {
+  color: #6256ca;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 20px;
+  height: 24px; /* Fixed height to prevent layout shift */
+}
+#resultDisplay {
+  display: none;
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #6256ca;
+  border-radius: 5px;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.preview-table {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.preview-table th {
+  background-color: #6256ca;
+  color: white;
+  padding: 8px;
+}
+
+.preview-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.preview-table tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.nav-tabs .nav-link {
+  color: #6256ca;
+}
+
+.nav-tabs .nav-link.active {
+  color: #6256ca;
+  font-weight: bold;
+}
+
+/* Style untuk result display */
+#resultDisplay ul {
+  list-style: none;
+  padding: 0;
+}
+
+#resultDisplay li {
+  padding: 8px;
+  margin: 4px 0;
+  background: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#resultDisplay li:hover {
+  background: #e9ecef;
+}
+
+#mapView {
+  height: 400px;
+  width: 100%;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+#map {
+    height: 400px !important;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f8f9fa;
+  }
+  
+  .modal-dialog {
+    max-width: 800px;  /* Lebih lebar untuk peta */
+  }
+  
+  .modal-body {
+    padding: 1rem;
+    min-height: 500px;  /* Memberikan ruang yang cukup untuk peta */
+  }
+
+.leaflet-popup-content {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.leaflet-popup-content b {
+  color: #6256ca;
+}
+
+/* Styling untuk marker popup */
+.leaflet-popup-content-wrapper {
+  border-radius: 4px;
+}
+
+.leaflet-popup-tip-container {
+  margin-top: -1px;
+}
