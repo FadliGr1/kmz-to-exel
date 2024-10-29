@@ -31,9 +31,16 @@
       <input type="file" id="fileInput" accept=".kmz" style="display: none" />
     </div>
     <button id="convertBtn" disabled>Convert to Excel</button>
-    <button id="downloadBtn" style="display: none">
-      Download Converted Files
-    </button>
+    <div id="resultWrapper">
+      <div id="resultDisplay"></div>
+      <button
+        id="downloadBtn"
+        class="btn btn-success btn-download"
+        style="display: none">
+        <i class="bi bi-download me-2"></i>
+        <span id="downloadBtnText">Download Files</span>
+      </button>
+    </div>
     <div id="resultDisplay"></div>
 
     <!-- Modal Preview -->

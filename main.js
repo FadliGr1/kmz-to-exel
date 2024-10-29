@@ -2,6 +2,7 @@ const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const convertBtn = document.getElementById("convertBtn");
 const downloadBtn = document.getElementById("downloadBtn");
+
 const loadingOverlay = document.getElementById("loadingOverlay");
 const loadingText = document.getElementById("loadingText");
 const resultDisplay = document.getElementById("resultDisplay");
@@ -33,7 +34,12 @@ convertBtn.addEventListener("click", () => {
       validateAndShowFileInfo(selectedFile);
     }
   });
-downloadBtn.addEventListener("click", downloadConvertedFiles);
+  
+  downloadBtn.addEventListener("click", () => {
+      if (convertedZip) {
+          downloadConvertedFiles();
+      }
+  });
 startConversionBtn.addEventListener("click", () => {
     // Ambil pengaturan dari form
     exportSettings = {
@@ -220,8 +226,6 @@ async function convertToExcel() {
     downloadBtn.style.display = "none";
     convertedData = {};
   
-    animateText("", 2000);
-  
     try {
       const zip = new JSZip();
       const kmzContent = await zip.loadAsync(selectedFile);
@@ -234,6 +238,9 @@ async function convertToExcel() {
         "Finalizing conversion..."
       ];
 
+      // Log untuk melihat isi kmzContent
+      console.log('KMZ Content:', kmzContent.files);
+
       for (const text of loadingTexts) {
         await animateText(text, 1000);
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -242,9 +249,15 @@ async function convertToExcel() {
       for (let [path, zipEntry] of Object.entries(kmzContent.files)) {
         if (path.endsWith(".kml")) {
           const kmlContent = await zipEntry.async("text");
+          // Log untuk melihat isi KML
+          console.log('KML Content:', kmlContent);
+
           const parser = new DOMParser();
           const xmlDoc = parser.parseFromString(kmlContent, "text/xml");
           const folders = xmlDoc.getElementsByTagName("Folder");
+          
+          // Log untuk melihat jumlah folder
+          console.log('Found folders:', folders.length);
   
           if (exportSettings.mode === 'merged') {
             mergedData = mergedData.concat(await processFolder(folders, "", null, true));
@@ -254,52 +267,70 @@ async function convertToExcel() {
         }
       }
   
+      // Log untuk melihat hasil konversi
+      console.log('Merged Data:', mergedData);
+      console.log('Output Zip Files:', outputZip.files);
+  
       if (exportSettings.mode === 'merged') {
         // Simpan data merged untuk preview
         mergedFileName = exportSettings.filename || 'merged_data';
         convertedData[mergedFileName] = mergedData;
-  
+
+        // Buat ZIP baru untuk file merged
+        const mergedZip = new JSZip();
+
         if (exportSettings.format === 'xlsx') {
           const workbook = XLSX.utils.book_new();
           const worksheet = XLSX.utils.json_to_sheet(mergedData);
           XLSX.utils.book_append_sheet(workbook, worksheet, "All Data");
           const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-          outputZip.file(`${mergedFileName}.xlsx`, excelBuffer);
+          // Masukkan file Excel ke dalam ZIP
+          mergedZip.file(`${mergedFileName}.xlsx`, excelBuffer);
         } else {
-          // Perbaikan untuk CSV
+          // Untuk CSV
           const worksheet = XLSX.utils.json_to_sheet(mergedData);
           const csvContent = XLSX.utils.sheet_to_csv(worksheet);
-          outputZip.file(`${mergedFileName}.csv`, csvContent);
+          // Masukkan file CSV ke dalam ZIP
+          mergedZip.file(`${mergedFileName}.csv`, csvContent);
         }
+
+        // Generate ZIP final
+        convertedZip = await mergedZip.generateAsync({ type: "blob" });
+      } else {
+        convertedZip = await outputZip.generateAsync({ type: "blob" });
       }
-  
-      convertedZip = await outputZip.generateAsync({ type: "blob" });
   
       const elapsedTime = Date.now() - startTime;
       if (elapsedTime < 5000) {
         await new Promise(resolve => setTimeout(resolve, 5000 - elapsedTime));
       }
   
-      displayResult(outputZip);
+      displayResult(exportSettings.mode === 'merged' ? mergedZip : outputZip);
     } catch (error) {
       console.error("Error converting file:", error);
       alert("An error occurred while converting the file. Please try again.");
     } finally {
       loadingOverlay.style.display = "none";
     }
-  }
-
+}
 // Process folder function
 async function processFolder(folders, parentPath, outputZip, returnData = false) {
     let allData = [];
+    
+    console.log('Processing folders:', folders.length);
     
     for (let folder of folders) {
       const folderName = folder.getElementsByTagName("name")[0]?.textContent || "Unnamed Folder";
       const currentPath = parentPath ? `${parentPath}/${folderName}` : folderName;
   
+      console.log('Processing folder:', folderName);
+
       const placemarks = folder.getElementsByTagName("Placemark");
       const subFolders = folder.getElementsByTagName("Folder");
   
+      console.log('Found placemarks:', placemarks.length);
+      console.log('Found subfolders:', subFolders.length);
+
       if (placemarks.length > 0 && subFolders.length === 0) {
         const data = [];
         for (let placemark of placemarks) {
@@ -316,24 +347,24 @@ async function processFolder(folders, parentPath, outputZip, returnData = false)
           data.push(rowData);
         }
   
+        console.log('Processed data:', data);
+
         // Selalu simpan data untuk preview
         convertedData[currentPath] = data;
   
         if (returnData) {
-          // Tambahkan informasi folder ke setiap baris untuk mode merged
           data.forEach(row => {
             row.Folder = currentPath;
           });
           allData = allData.concat(data);
         } else {
-          const worksheet = createWorksheet(data);
           if (exportSettings.format === 'xlsx') {
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Placemarks");
+            XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data), "Placemarks");
             const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
             outputZip.file(`${currentPath}.xlsx`, excelBuffer);
           } else {
-            const csvContent = XLSX.utils.sheet_to_csv(worksheet);
+            const csvContent = XLSX.utils.sheet_to_csv(XLSX.utils.json_to_sheet(data));
             outputZip.file(`${currentPath}.csv`, csvContent);
           }
         }
@@ -347,8 +378,9 @@ async function processFolder(folders, parentPath, outputZip, returnData = false)
       }
     }
   
+    console.log('Returning data:', allData);
     return returnData ? allData : null;
-  }
+}
 
   function createWorksheet(data) {
     // Pastikan data memiliki format yang konsisten
@@ -370,33 +402,60 @@ async function processFolder(folders, parentPath, outputZip, returnData = false)
 // Display results function
 function displayResult(outputZip) {
     const fileList = Object.keys(outputZip.files).filter(
-      (filename) => !outputZip.files[filename].dir
+        (filename) => !outputZip.files[filename].dir
     );
+
     let resultHTML = `
-      <h3 class="animate__animated animate__fadeIn">
-        <i class="bi bi-check-circle-fill text-success me-2"></i>
-        Converted Files:
-      </h3>
-      <ul>
+        <div class="result-header animate__animated animate__fadeIn">
+            <div class="result-header-content">
+                <div class="result-title">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    Converted Files
+                    <span class="file-count">${fileList.length} files</span>
+                </div>
+                <div class="result-info">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Click on file to preview content
+                    </small>
+                </div>
+            </div>
+        </div>
+        <ul class="converted-files-list">
     `;
+
     fileList.forEach((filename, index) => {
-      const previewPath = filename.replace(/\.(xlsx|csv)$/, '');
-      const delay = index * 100; // Stagger animation
-      resultHTML += `
-        <li 
-          class="animate__animated animate__fadeInUp" 
-          style="animation-delay: ${delay}ms"
-          onclick="showPreview('${previewPath}')">
-          <i class="bi bi-${exportSettings.format === 'xlsx' ? 'file-earmark-excel' : 'file-earmark-text'} me-2"></i>
-          ${filename}
-        </li>
-      `;
+        const fileIcon = exportSettings.format === 'xlsx' ? 'file-earmark-excel' : 'file-earmark-text';
+        const fileExtension = exportSettings.format === 'xlsx' ? 'Excel' : 'CSV';
+        const previewPath = filename.replace(/\.(xlsx|csv)$/, '');
+        
+        resultHTML += `
+            <li class="file-item animate__animated animate__fadeInUp animate__delay-${index}s" 
+                onclick="showPreview('${previewPath}')">
+                <div class="file-info">
+                    <i class="bi bi-${fileIcon} file-icon"></i>
+                    <div class="file-details">
+                        <span class="file-name">${filename}</span>
+                        <span class="file-type">${fileExtension} File</span>
+                    </div>
+                </div>
+                <i class="bi bi-eye preview-icon"></i>
+            </li>
+        `;
     });
-    resultHTML += "</ul>";
+    
+    resultHTML += `</ul>`;
+    
+    // Update result display
     resultDisplay.innerHTML = resultHTML;
     resultDisplay.style.display = "block";
+
+    // Update download button
+    const downloadBtnText = document.getElementById('downloadBtnText');
+    if (downloadBtnText) {
+        downloadBtnText.innerHTML = `Download ${fileList.length > 1 ? 'Files' : 'File'} <small class="download-meta">${exportSettings.format.toUpperCase()}</small>`;
+    }
     downloadBtn.style.display = "block";
-    downloadBtn.className = 'btn btn-success animate__animated animate__bounceIn';
 }
 
 // Preview function
@@ -589,17 +648,25 @@ function showPreview(path) {
 // Download function
 function downloadConvertedFiles() {
     if (convertedZip) {
-      const url = window.URL.createObjectURL(convertedZip);
-      const a = document.createElement("a");
-      a.href = url;
-      if (exportSettings.mode === 'merged') {
-        const extension = exportSettings.format === 'xlsx' ? 'xlsx' : 'csv';
-        a.download = `${mergedFileName}.${extension}`;
-      } else {
-        a.download = "converted_data.zip";
-      }
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
+        const url = window.URL.createObjectURL(convertedZip);
+        const a = document.createElement("a");
+        a.href = url;
+        
+        // Dapatkan nama file yang diinput
+        const customFileName = document.getElementById('outputFilename').value;
+        const baseFileName = customFileName || 'converted_data';
+        
+        if (exportSettings.mode === 'merged') {
+            // Untuk mode merged, tetap gunakan ZIP
+            const zipFileName = `${baseFileName}.zip`;
+            a.download = zipFileName;
+        } else {
+            // Untuk mode separate
+            a.download = `${baseFileName}.zip`;
+        }
+        
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
     }
-  }
+}

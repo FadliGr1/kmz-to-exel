@@ -235,19 +235,48 @@ p {
   padding: 10px;
 }
 
+/* Styling untuk File Info Items */
 .file-info-item {
   display: flex;
   align-items: start;
   margin-bottom: 15px;
-  padding: 10px;
+  padding: 16px;
   background: #f8f9fa;
-  border-radius: 5px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+}
+
+.file-info-item:hover {
+  transform: translateX(5px);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(98, 86, 202, 0.1);
 }
 
 .file-info-item i {
   font-size: 24px;
   color: #6256ca;
   margin-right: 15px;
+  padding: 10px;
+  background: rgba(98, 86, 202, 0.1);
+  border-radius: 8px;
+}
+
+/* Warning styling improvement */
+.warning-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 12px;
+  background: #fff3cd;
+  border-radius: 8px;
+  border: 1px solid #ffeeba;
+}
+
+.warning-item i {
+  margin-right: 12px;
+  color: #856404;
+  font-size: 18px;
 }
 
 .info-details h6 {
@@ -263,17 +292,6 @@ p {
 
 #fileWarnings {
   margin-top: 15px;
-}
-
-.warning-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.warning-item i {
-  margin-right: 8px;
-  color: #ffc107;
 }
 
 .modal.fade .modal-dialog {
@@ -323,4 +341,267 @@ p {
 .coordinates i {
   width: 16px;
   color: #6256ca;
+}
+
+/* Result Display Styling */
+#resultDisplay {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.result-header {
+  padding: 20px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.result-header-content {
+  flex: 1;
+}
+
+.result-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.file-count {
+  font-size: 14px;
+  color: #6c757d;
+  margin-left: 10px;
+  padding: 2px 8px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  font-weight: normal;
+}
+
+.result-info {
+  color: #6c757d;
+}
+
+.converted-files-list {
+  padding: 0;
+  margin: 0;
+}
+
+.file-item {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.file-item:last-child {
+  border-bottom: none;
+}
+
+.file-item:hover {
+  background-color: #f8f9fa;
+  transform: translateX(5px);
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.file-icon {
+  font-size: 24px;
+  color: #6256ca;
+}
+
+.file-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.file-type {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.preview-icon {
+  color: #6c757d;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.file-item:hover .preview-icon {
+  opacity: 1;
+  color: #6256ca;
+}
+
+.download-section {
+  padding: 20px;
+  text-align: center;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+#resultWrapper {
+  position: relative;
+}
+
+#downloadBtn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.btn-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+}
+
+.download-meta {
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* Animation delays */
+.animate__delay-0s {
+  animation-delay: 0s;
+}
+.animate__delay-1s {
+  animation-delay: 0.1s;
+}
+.animate__delay-2s {
+  animation-delay: 0.2s;
+}
+.animate__delay-3s {
+  animation-delay: 0.3s;
+}
+.animate__delay-4s {
+  animation-delay: 0.4s;
+}
+
+/* Hover effects pada buttons */
+.btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+/* Animasi untuk success indicators */
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.success-icon {
+  animation: checkmark 0.5s ease-in-out;
+}
+
+/* Styling untuk Export Settings Modal */
+#settingsModal .modal-content {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+#settingsModal .modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+#settingsModal .modal-title {
+  font-weight: 600;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#settingsModal .form-label {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+#settingsModal .mb-3 {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 16px !important;
+  border: 1px solid #e9ecef;
+}
+
+#settingsModal .form-check {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+#settingsModal .form-check:hover {
+  background: rgba(98, 86, 202, 0.05);
+}
+
+#settingsModal .form-check-input:checked {
+  background-color: #6256ca;
+  border-color: #6256ca;
+}
+
+#settingsModal .form-check-label {
+  cursor: pointer;
+}
+
+#settingsModal .form-control:focus {
+  border-color: #6256ca;
+  box-shadow: 0 0 0 0.25rem rgba(98, 86, 202, 0.25);
+}
+
+#settingsModal .modal-footer {
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+#settingsModal .btn-secondary {
+  background: white;
+  border: 1px solid #e9ecef;
+  color: #6c757d;
+}
+
+#settingsModal .btn-secondary:hover {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+#settingsModal .btn-primary {
+  background-color: #6256ca;
+  border-color: #6256ca;
+}
+
+#settingsModal .btn-primary:hover {
+  background-color: #7667ef;
+  border-color: #7667ef;
 }
