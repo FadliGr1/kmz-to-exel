@@ -436,7 +436,6 @@ function showPreview(path) {
     tableContent.id = 'tableView';
     
     let tableHTML = `
-      <div class="table-responsive">
         <div class="preview-header mb-3">
           <h6 class="preview-title">
             <i class="bi bi-file-earmark-text me-2"></i>
@@ -447,6 +446,8 @@ function showPreview(path) {
             ${data.length} records
           </span>
         </div>
+      <div class="table-responsive">
+        
         <table class="preview-table">
           <thead>
             <tr>
